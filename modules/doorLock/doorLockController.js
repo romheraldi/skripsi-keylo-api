@@ -92,7 +92,7 @@ module.exports = {
             doorLock.uniqueId = req.body.uniqueId ? req.body.uniqueId : doorLock.uniqueId;
 			doorLock.name = req.body.name ? req.body.name : doorLock.name;
 			doorLock.authenticator = req.body.authenticator ? req.body.authenticator : doorLock.authenticator;
-			doorLock.deletedAt = req.body.deletedAt ? req.body.deletedAt : doorLock.deletedAt;
+			doorLock.deletedAt = req.body.deletedAt || req.body.deletedAt === "" ? req.body.deletedAt : doorLock.deletedAt;
 
             doorLock.save(function (err, doorLock) {
                 if (err) {

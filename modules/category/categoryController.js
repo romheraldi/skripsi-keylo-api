@@ -89,7 +89,7 @@ module.exports = {
             }
 
             category.name = req.body.name ? req.body.name : category.name;
-			category.deletedAt = req.body.deletedAt ? req.body.deletedAt : category.deletedAt;
+			category.deletedAt = req.body.deletedAt || req.body.deletedAt === "" ? req.body.deletedAt : category.deletedAt;
 			
             category.save(function (err, category) {
                 if (err) {

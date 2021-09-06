@@ -89,7 +89,7 @@ module.exports = {
             }
 
             division.name = req.body.name ? req.body.name : division.name;
-            division.deletedAt = req.body.deletedAt ? req.body.deletedAt : division.deletedAt;
+            division.deletedAt = req.body.deletedAt || req.body.deletedAt === "" ? req.body.deletedAt : division.deletedAt;
 
             division.save(function (err, division) {
                 if (err) {

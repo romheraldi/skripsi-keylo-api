@@ -88,7 +88,7 @@ module.exports = {
             }
 
             position.name = req.body.name ? req.body.name : position.name;
-            position.deletedAt = req.body.deletedAt ? req.body.deletedAt : position.deletedAt;
+            position.deletedAt = req.body.deletedAt || req.body.deletedAt === "" ? req.body.deletedAt : position.deletedAt;
 
             position.save(function (err, position) {
                 if (err) {
