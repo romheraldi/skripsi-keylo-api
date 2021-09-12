@@ -6,11 +6,13 @@ let logger = require('morgan');
 let sassMiddleware = require('node-sass-middleware');
 let mongoose = require('mongoose');
 let router = require('./routes/routes');
+let cors = require('cors');
 
 let app = express();
-let port = 3000;
+let port = 5000;
 
 app.use(logger('dev'));
+app.use(cors());
 app.use(express.json());
 app.use(
     express.urlencoded({
