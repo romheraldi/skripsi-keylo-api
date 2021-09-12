@@ -12,14 +12,13 @@ module.exports = {
      * employeeController.list()
      */
     list: function (req, res) {
-        EmployeeModel.find(function (err, employees) {
+        EmployeeModel.find().populate('position').populate('division').exec(function (err, employees) {
             if (err) {
                 return res.status(500).json({
                     message: 'Error when getting employee.',
                     error: err
                 });
             }
-
             return res.json(employees);
         });
     },
@@ -30,7 +29,7 @@ module.exports = {
     show: function (req, res) {
         let id = req.params.id;
 
-        EmployeeModel.findOne({_id: id}, function (err, employee) {
+        EmployeeModel.findOne({_id: id}, ).populate('position').populate('division').exec(function (err, employee) {
             if (err) {
                 return res.status(500).json({
                     message: 'Error when getting employee.',
@@ -52,7 +51,7 @@ module.exports = {
      * employeeController.create()
      */
     create: function (req, res) {
-        EmployeeModel.findOne({email: req.body.email}, function (err, data) {
+        EmployeeModel.findOne({email: req.body.email}, function (err, employee) {
             if (err) {
                 return res.status(500).json({
                     message: 'Error when getting employee',
@@ -60,13 +59,13 @@ module.exports = {
                 });
             }
 
-            if (!employee) {
+            if (employee) {
                 return res.status(403).json({
                     message: 'Employee with email already exists'
                 });
             }
 
-            bcrypt.genSalt(10, function(err, salt) {
+            bcrypt.genSalt(10, function (err, salt) {
                 if (err) {
                     return res.status(500).json({
                         message: 'Error when gen salt bcrypt',
@@ -74,7 +73,7 @@ module.exports = {
                     });
                 }
 
-                bcrypt.hash(req.body.password, salt, function(err, hash) {
+                bcrypt.hash(req.body.password, salt, function (err, hash) {
                     // Store hash in your password DB.
 
                     if (err) {
@@ -85,12 +84,12 @@ module.exports = {
                     }
 
                     let employee = new EmployeeModel({
-                        fullName : req.body.fullName,
-                        sureName : req.body.sureName,
-                        division : req.body.division,
-                        position : req.body.position,
-                        email : req.body.email,
-                        password : hash,
+                        fullName: req.body.fullName,
+                        sureName: req.body.sureName,
+                        division: req.body.division,
+                        position: req.body.position,
+                        email: req.body.email,
+                        password: hash,
                     });
 
                     employee.save(function (err, employee) {
@@ -129,25 +128,45 @@ module.exports = {
                 });
             }
 
-            employee.fullName = req.body.fullName ? req.body.fullName : employee.fullName;
-			employee.sureName = req.body.sureName ? req.body.sureName : employee.sureName;
-			employee.division = req.body.division ? req.body.division : employee.division;
-			employee.position = req.body.position ? req.body.position : employee.position;
-			employee.email = req.body.email ? req.body.email : employee.email;
-			employee.password = req.body.password ? req.body.password : employee.password;
-
-            employee.deletedAt = req.body.deletedAt || req.body.deletedAt === "" ? req.body.deletedAt : employee.deletedAt;
-			
-            employee.save(function (err, employee) {
+            bcrypt.genSalt(10, function (err, salt) {
                 if (err) {
                     return res.status(500).json({
-                        message: 'Error when updating employee.',
+                        message: 'Error when gen salt bcrypt',
                         error: err
                     });
                 }
 
-                return res.json(employee);
-            });
+                bcrypt.hash(req.body.password, salt, function (err, hash) {
+                    // Store hash in your password DB.
+
+                    if (err) {
+                        return res.status(500).json({
+                            message: 'Error when hashing password',
+                            error: err
+                        });
+                    }
+
+                    employee.fullName = req.body.fullName ? req.body.fullName : employee.fullName;
+                    employee.sureName = req.body.sureName ? req.body.sureName : employee.sureName;
+                    employee.division = req.body.division ? req.body.division : employee.division;
+                    employee.position = req.body.position ? req.body.position : employee.position;
+                    employee.email = req.body.email ? req.body.email : employee.email;
+                    employee.password = req.body.password ? hash : employee.password;
+
+                    employee.deletedAt = req.body.deletedAt || req.body.deletedAt === "" ? req.body.deletedAt : employee.deletedAt;
+
+                    employee.save(function (err, employee) {
+                        if (err) {
+                            return res.status(500).json({
+                                message: 'Error when updating employee.',
+                                error: err
+                            });
+                        }
+
+                        return res.json(employee);
+                    });
+                });
+            })
         });
     },
 

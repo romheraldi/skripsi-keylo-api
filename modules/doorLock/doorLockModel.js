@@ -1,16 +1,19 @@
-var mongoose = require('mongoose');
-var Schema   = mongoose.Schema;
+let mongoose = require('mongoose');
+let Schema   = mongoose.Schema;
 
-var doorLockSchema = new Schema({
+let Employee = require('../employee/employeeModel');
+let Category = require('../category/categoryModel');
+
+let doorLockSchema = new Schema({
 	'uniqueId' : String,
 	'name' : String,
 	'authenticator' : {
 	 	type: Schema.Types.ObjectId,
-	 	ref: 'Employee'
+	 	ref: Employee
 	},
 	'category' : {
 		type: Schema.Types.ObjectId,
-		ref: 'Category'
+		ref: Category
 	},
 	'deletedAt' : Date
 });

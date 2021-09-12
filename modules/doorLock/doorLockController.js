@@ -1,4 +1,5 @@
 var DoorlockModel = require('./doorLockModel.js');
+let Employee = require('../employee/employeeModel');
 
 /**
  * doorLockController.js
@@ -11,7 +12,8 @@ module.exports = {
      * doorLockController.list()
      */
     list: function (req, res) {
-        DoorlockModel.find(function (err, doorLocks) {
+        DoorlockModel.find().populate({path: 'authenticator', model: Employee}).populate('category').exec(function (err, doorLocks) {
+            console.log(err);
             if (err) {
                 return res.status(500).json({
                     message: 'Error when getting doorLock.',
@@ -29,7 +31,7 @@ module.exports = {
     show: function (req, res) {
         var id = req.params.id;
 
-        DoorlockModel.findOne({_id: id}, function (err, doorLock) {
+        DoorlockModel.findOne({_id: id}, ).populate({path: 'authenticator', model: Employee}).populate('category').exec(function (err, doorLock) {
             if (err) {
                 return res.status(500).json({
                     message: 'Error when getting doorLock.',
@@ -54,6 +56,7 @@ module.exports = {
         var doorLock = new DoorlockModel({
 			uniqueId : req.body.uniqueId,
 			name : req.body.name,
+			category : req.body.category,
 			authenticator : req.body.authenticator
         });
 
@@ -90,6 +93,7 @@ module.exports = {
             }
 
             doorLock.uniqueId = req.body.uniqueId ? req.body.uniqueId : doorLock.uniqueId;
+            doorLock.category = req.body.category ? req.body.category : doorLock.category;
 			doorLock.name = req.body.name ? req.body.name : doorLock.name;
 			doorLock.authenticator = req.body.authenticator ? req.body.authenticator : doorLock.authenticator;
 			doorLock.deletedAt = req.body.deletedAt || req.body.deletedAt === "" ? req.body.deletedAt : doorLock.deletedAt;
